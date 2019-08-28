@@ -38,6 +38,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.1.1', '<')) {
             $this->fixReportVersion($setup);
         }
+        if (version_compare($context->getVersion(), '1.1.2', '<')) {
+            $this->upgradeRetailTransaction($setup);
+        }
     }
 
     /**
@@ -356,6 +359,27 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'comment' => 'Order Id',
             ]
         );
+        $setup->endSetup();
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    protected function upgradeRetailTransaction(SchemaSetupInterface $setup)
+    {
+        $setup->startSetup();
+        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_retail_transaction'), 'user_name')) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable('sm_retail_transaction'),
+                'user_name',
+                [
+                    'type'    => Table::TYPE_TEXT,
+                    'size'    => 255,
+                    'comment' => 'User name',
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 
