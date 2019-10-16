@@ -41,6 +41,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.1.2', '<')) {
             $this->upgradeRetailTransaction($setup);
         }
+        if (version_compare($context->getVersion(), '1.1.3', '<')) {
+            $this->upgradeBaseAmountRetailTransaction($setup);
+        }
     }
 
     /**
@@ -445,4 +448,41 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateShiftTable($setup);
         }
     }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    protected function upgradeBaseAmountRetailTransaction(SchemaSetupInterface $setup)
+    {
+        $setup->startSetup();
+        $tableName = $setup->getTable('sm_retail_transaction');
+        if (!$setup->getConnection()->tableColumnExists($setup->getTable($tableName), 'base_amount')) {
+            $setup->getConnection()->addColumn(
+                $tableName,
+                'base_amount',
+                [
+                    'type'      => Table::TYPE_DECIMAL,
+                    'nullable'  => false,
+                    'SCALE'     => 4,
+                    'PRECISION' => 12,
+                    'comment'   => 'Base amount',
+                    'default'   => '0.0000'
+                ]
+            );
+            $select = $setup->getConnection()->select()
+                ->joinLeft(['join_table'=> $tableName],
+
+                    "main_table.id = join_table.id",
+
+                    array('base_amount' => 'amount'));
+            $query = $setup->getConnection()->updateFromSelect(
+                $select,
+                ['main_table' => $tableName]
+            );
+            $setup->getConnection()->query($query);
+        }
+
+        $setup->endSetup();
+    }
+
 }
