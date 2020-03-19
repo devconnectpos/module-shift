@@ -103,7 +103,7 @@ class RetailTransactionRepository implements RetailTransactionRepositoryInterfac
     /**
      * @param \Magento\Framework\Api\SearchCriteriaInterface $criteria
      *
-     * @return mixed
+     * @return \Magento\Framework\Api\SearchResultsInterface|mixed
      */
     public function getList(SearchCriteriaInterface $criteria)
     {
