@@ -227,4 +227,20 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::USERNAME, $username);
 	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function getRwrTransactionId()
+	{
+		return $this->getData(self::RWR_TRANSACTION_ID);
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function setRwrTransactionId($transactionId)
+	{
+		return $this->setData(self::RWR_TRANSACTION_ID, $transactionId);
+	}
 }

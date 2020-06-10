@@ -44,6 +44,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.1.3', '<')) {
             $this->upgradeBaseAmountRetailTransaction($setup);
         }
+        if (version_compare($context->getVersion(), '1.1.4', '<')) {
+            $this->addRefundWithoutReceiptIdToRetailTransaction($setup);
+        }
     }
 
     /**
@@ -484,5 +487,25 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $setup->endSetup();
     }
+	
+	protected function addRefundWithoutReceiptIdToRetailTransaction(SchemaSetupInterface $setup)
+	{
+		$setup->startSetup();
+		$tableName = $setup->getTable('sm_retail_transaction');
+		if (!$setup->getConnection()->tableColumnExists($setup->getTable($tableName), 'rwr_transaction_id')) {
+			$setup->getConnection()->addColumn(
+				$tableName,
+				'rwr_transaction_id',
+				[
+					'type'      => Table::TYPE_INTEGER,
+					'nullable'  => true,
+					'length'    => 12,
+					'comment'   => 'Refund Without Receipt Transaction Id',
+				]
+			);
+		}
+		
+		$setup->endSetup();
+	}
 
 }
