@@ -38,14 +38,14 @@ class RetailTransactionRepository implements RetailTransactionRepositoryInterfac
         $this->collectionFactory    = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
     }
-
-    /**
-     * @param \SM\Shift\Model\RetailTransactionInterface $object
-     *
-     * @return \SM\Shift\Model\RetailTransactionInterface
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
-     */
-    public function save(RetailTransactionInterface $object)
+	
+	
+	/**
+	 * @param \SM\Shift\Api\Data\RetailTransactionInterface $object
+	 * @return \SM\Shift\Api\Data\RetailTransactionInterface
+	 * @throws CouldNotSaveException
+	 */
+	public function save(\SM\Shift\Api\Data\RetailTransactionInterface $object)
     {
         try {
             $object->save();
@@ -71,14 +71,14 @@ class RetailTransactionRepository implements RetailTransactionRepositoryInterfac
         }
         return $object;
     }
-
-    /**
-     * @param \SM\Shift\Model\RetailTransactionInterface $object
-     *
-     * @return bool
-     * @throws \Magento\Framework\Exception\CouldNotDeleteException
-     */
-    public function delete(RetailTransactionInterface $object)
+	
+	
+	/**
+	 * @param \SM\Shift\Api\Data\RetailTransactionInterface $object
+	 * @return bool
+	 * @throws CouldNotDeleteException
+	 */
+	public function delete(\SM\Shift\Api\Data\RetailTransactionInterface $object)
     {
         try {
             $object->delete();
