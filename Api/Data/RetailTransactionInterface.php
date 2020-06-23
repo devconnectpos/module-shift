@@ -22,6 +22,8 @@ interface RetailTransactionInterface
     const UPDATED_AT    = 'updated_at';
     const ORDER_ID      = 'order_id';
     const USERNAME      = 'username';
+    //Refund without receipt transaction id
+    const RWR_TRANSACTION_ID      = 'rwr_transction_id';
 	
 	/**
 	 * @return mixed
@@ -165,4 +167,15 @@ interface RetailTransactionInterface
 	 * @return mixed
 	 */
 	public function setUsername($username);
+	
+	/**
+	 * @return mixed
+	 */
+	public function getRwrTransactionId();
+	
+	/**
+	 * @param $transactionId
+	 * @return mixed
+	 */
+	public function setRwrTransactionId($transactionId);
 }
