@@ -9,6 +9,8 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	protected $_idFieldName = 'id';
 
     const CACHE_TAG = 'sm_retail_transaction';
+    
+    protected $_eventPrefix = 'sm_retail_transaction';
 
     protected function _construct()
     {
@@ -226,5 +228,21 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	public function setUsername($username)
 	{
 		return $this->setData(self::USERNAME, $username);
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function getRwrTransactionId()
+	{
+		return $this->getData(self::RWR_TRANSACTION_ID);
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function setRwrTransactionId($transactionId)
+	{
+		return $this->setData(self::RWR_TRANSACTION_ID, $transactionId);
 	}
 }

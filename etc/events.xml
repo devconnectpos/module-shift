@@ -1,0 +1,5 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="connectpos_save_retail_transaction">
+        <observer name="connectpos_save_retail_transaction" instance="\SM\Shift\Observer\SaveRetailTransaction"/>
+    </event>
+</config>
