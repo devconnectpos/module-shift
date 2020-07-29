@@ -83,8 +83,7 @@ class SaveRetailTransaction implements ObserverInterface
 							"created_at"    => $created_at,
 							'order_id'      => $orderData->getData('entity_id'),
 							"user_name"     => isset($data['user_name']) ? $data['user_name'] : '',
-							'base_amount'   => isset($rates[$currentCurrencyCode]) && $rates[$currentCurrencyCode] != 0 ? $payment_datum['amount']
-								/ $rates[$currentCurrencyCode] : null,
+							'base_amount'   => isset($rates[$currentCurrencyCode]) && $rates[$currentCurrencyCode] != 0 ? $payment_datum['amount'] / $rates[$currentCurrencyCode] : $payment_datum['amount'],
 						]
 					)->save();
 				}
