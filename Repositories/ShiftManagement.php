@@ -272,6 +272,8 @@ class ShiftManagement extends ServiceAbstract
         $userId     = $this->getRequest()->getParam('user_id');
         $userName   = $this->getRequest()->getParam('user_name');
         $amount     = $this->getRequest()->getParam('amount');
+        $bankNotes  = $this->getRequest()->getParam('bank_notes', []);
+        
         if (is_null($outletId) || is_null($registerId) || is_null($userId) || is_null($userName) || is_null($amount)) {
             throw new Exception("Must define required data");
         }
@@ -295,7 +297,8 @@ class ShiftManagement extends ServiceAbstract
               ->setData('user_open_name', $userName)
               ->setData('start_amount', $amount)
               ->setData('open_note', $this->getRequest()->getParam('note'))
-              ->setData('detail_tax', "{}")
+              ->setData('detail_tax', '{}')
+              ->setData('bank_notes', json_encode($bankNotes))
               ->save();
 
         return $this->load(
