@@ -47,6 +47,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.1.4', '<')) {
             $this->addRefundWithoutReceiptIdToRetailTransaction($setup);
         }
+        if (version_compare($context->getVersion(), '1.1.5', '<')) {
+            $this->addBankNoteToShiftTable($setup);
+        }
+    
     }
 
     /**
@@ -487,7 +491,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $setup->endSetup();
     }
-	
+    
+    /**
+     * @param SchemaSetupInterface $setup
+     */
 	protected function addRefundWithoutReceiptIdToRetailTransaction(SchemaSetupInterface $setup)
 	{
 		$setup->startSetup();
@@ -507,5 +514,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
 		
 		$setup->endSetup();
 	}
-
+    
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    protected function addBankNoteToShiftTable(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $shiftTable = $setup->getTable('sm_shift_shift');
+        if (!$connection->tableColumnExists($shiftTable, 'bank_notes')) {
+            $connection->addColumn(
+                $shiftTable,
+                'bank_notes',
+                [
+                    'type'      => Table::TYPE_TEXT,
+                    'nullable'  => true,
+                    'length'    => '2M',
+                    'comment'   => 'Shift bank notes',
+                ]
+            );
+        }
+    }
+    
 }
