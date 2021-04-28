@@ -2,7 +2,7 @@
 	"name": "connectpos/module-shift",
 	"description": "N/A",
 	"type": "magento2-module",
-	"version": "20.10.08",
+	"version": "21.04.28",
 	"license": [
 		"proprietary"
 	],

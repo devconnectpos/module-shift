@@ -9,7 +9,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	protected $_idFieldName = 'id';
 
     const CACHE_TAG = 'sm_retail_transaction';
-    
+
     protected $_eventPrefix = 'sm_retail_transaction';
 
     protected function _construct()
@@ -21,15 +21,15 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }
-	
+
 	/**
 	 * @inheritDoc
 	 */
 	public function getPaymentId()
 	{
-		return $this->getData(self::ID);
+		return $this->getData(self::PAYMENT_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -37,7 +37,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::PAYMENT_ID, $paymentId);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -45,7 +45,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::SHIFT_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -53,7 +53,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::SHIFT_ID, $shiftId);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -61,7 +61,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::OUTLET_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -69,7 +69,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::OUTLET_ID, $outletId);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -77,7 +77,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::REGISTER_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -85,7 +85,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::REGISTER_ID, $registerId);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -93,7 +93,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::PAYMENT_TITLE);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -101,7 +101,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::PAYMENT_TITLE, $paymentTitle);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -109,7 +109,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::PAYMENT_TYPE);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -117,7 +117,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::PAYMENT_TYPE, $paymentType);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -125,7 +125,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::AMOUNT);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -133,7 +133,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::AMOUNT, $amount);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -141,7 +141,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::BASE_AMOUNT);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -149,7 +149,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::BASE_AMOUNT, $baseAmount);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -157,7 +157,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::IS_PURCHASE);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -165,7 +165,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::IS_PURCHASE, $isPurchase);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -173,7 +173,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::CREATED_AT);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -181,7 +181,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::CREATED_AT, $createdAt);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -189,7 +189,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::UPDATED_AT);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -197,7 +197,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::UPDATED_AT, $updatedAt);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -205,7 +205,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::ORDER_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -213,7 +213,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::ORDER_ID, $orderId);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -221,7 +221,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::USERNAME);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -229,7 +229,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->setData(self::USERNAME, $username);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -237,7 +237,7 @@ class RetailTransaction extends AbstractModel implements \SM\Shift\Api\Data\Reta
 	{
 		return $this->getData(self::RWR_TRANSACTION_ID);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
