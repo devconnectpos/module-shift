@@ -29,7 +29,7 @@ class SaveRetailTransaction implements ObserverInterface
 	 * @var \SM\Shift\Model\RetailTransactionFactory
 	 */
 	private $retailTransactionFactory;
-	
+
 	public function __construct(
 		\Magento\Store\Model\StoreManagerInterface $storeManager,
 		\Magento\Directory\Model\Currency $currencyModel,
@@ -37,19 +37,19 @@ class SaveRetailTransaction implements ObserverInterface
 		\SM\XRetail\Helper\Data $retailHelper,
 		\SM\Shift\Model\RetailTransactionFactory $retailTransactionFactory
 	) {
-		
+
 		$this->storeManager = $storeManager;
 		$this->currencyModel = $currencyModel;
 		$this->registry = $registry;
 		$this->retailHelper = $retailHelper;
 		$this->retailTransactionFactory = $retailTransactionFactory;
 	}
-	
+
 	public function execute(\Magento\Framework\Event\Observer $observer)
 	{
 		$orderData = $observer->getData('orderData');
 		$data = $observer->getData('requestData');
-		
+
 		$baseCurrencyCode    = $this->storeManager->getStore()->getBaseCurrencyCode();
 		$currentCurrencyCode = $this->storeManager->getStore($orderData->getData('store_id'))->getCurrentCurrencyCode();
 		$allowedCurrencies   = $this->currencyModel->getConfigAllowCurrencies();
@@ -68,6 +68,10 @@ class SaveRetailTransaction implements ObserverInterface
 					if (!isset($payment_datum['id']) || !$payment_datum['id']) {
 						throw new \Exception("Payment data not valid");
 					}
+					$amount = floatval($payment_datum['amount']);
+					if ($amount == 0) {
+					    continue;
+                    }
 					$created_at = $this->retailHelper->getCurrentTime();
 					$_p         = $this->retailTransactionFactory->create();
 					$_p->addData(
@@ -78,7 +82,7 @@ class SaveRetailTransaction implements ObserverInterface
 							'payment_id'    => $payment_datum['id'],
 							'payment_title' => $payment_datum['title'],
 							'payment_type'  => $payment_datum['type'],
-							'amount'        => $payment_datum['amount'],
+							'amount'        => $amount,
 							'is_purchase'   => 1,
 							"created_at"    => $created_at,
 							'order_id'      => $orderData->getData('entity_id'),
