@@ -273,7 +273,7 @@ class ShiftManagement extends ServiceAbstract
         $userName   = $this->getRequest()->getParam('user_name');
         $amount     = $this->getRequest()->getParam('amount');
         $bankNotes  = $this->getRequest()->getParam('bank_notes', []);
-        
+
         if (is_null($outletId) || is_null($registerId) || is_null($userId) || is_null($userName) || is_null($amount)) {
             throw new Exception("Must define required data");
         }
@@ -371,16 +371,16 @@ class ShiftManagement extends ServiceAbstract
             throw new Exception("Can't close shift because it isn't opening");
         }
 
-        $cashPaymentId = $this->getCashPaymentId();
-        if (isset($data['counted'][$this->getCashPaymentId()]) && is_numeric($data['counted'][$cashPaymentId])) {
-            $totalCounted = $data['counted'][$this->getCashPaymentId()];
+        $cashPaymentId = $this->getCashPaymentId($registerId);
+        if (isset($data['counted'][$this->getCashPaymentId($registerId)]) && is_numeric($data['counted'][$cashPaymentId])) {
+            $totalCounted = $data['counted'][$this->getCashPaymentId($registerId)];
         } else {
             throw new Exception('Total cash counted must be positive number');
         }
 
-        if (isset($data['expected'][$this->getCashPaymentId()])
-            && is_numeric($data['expected'][$this->getCashPaymentId()])) {
-            $totalExpected = $data['expected'][$this->getCashPaymentId()];
+        if (isset($data['expected'][$this->getCashPaymentId($registerId)])
+            && is_numeric($data['expected'][$this->getCashPaymentId($registerId)])) {
+            $totalExpected = $data['expected'][$this->getCashPaymentId($registerId)];
         } else {
             throw new Exception('Total cash expected must be number');
         }
@@ -429,9 +429,9 @@ class ShiftManagement extends ServiceAbstract
         )->getOutput();
     }
 
-    protected function getCashPaymentId()
+    protected function getCashPaymentId($registerId)
     {
-        $cashPayment = $this->paymentHelper->getPaymentIdByType('cash');
+        $cashPayment = $this->paymentHelper->getPaymentIdByType('cash', $registerId);
         if ($cashPayment != null) {
             return $cashPayment;
         }
