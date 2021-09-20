@@ -96,13 +96,13 @@ class ShiftManagement extends ServiceAbstract
         ShiftRetailCollectionFactory $transactionCollectionFactory
     ) {
         $this->transactionCollectionFactory = $transactionCollectionFactory;
-        $this->dateTime                     = $dateTime;
-        $this->shiftFactory                 = $shiftFactory;
-        $this->shiftInOut                   = $shiftInOutFactory;
-        $this->shiftInOutCollection         = $shiftInOutCollectionFactory;
-        $this->shiftCollectionFactory       = $shiftCollectionFactory;
-        $this->retailHelper                 = $retailHelper;
-        $this->paymentHelper                = $paymentHelper;
+        $this->dateTime = $dateTime;
+        $this->shiftFactory = $shiftFactory;
+        $this->shiftInOut = $shiftInOutFactory;
+        $this->shiftInOutCollection = $shiftInOutCollectionFactory;
+        $this->shiftCollectionFactory = $shiftCollectionFactory;
+        $this->retailHelper = $retailHelper;
+        $this->paymentHelper = $paymentHelper;
         parent::__construct($requestInterface, $dataConfig, $storeManager);
     }
 
@@ -129,13 +129,13 @@ class ShiftManagement extends ServiceAbstract
         $this->getSearchResult()->setSearchCriteria($searchCriteria);
         $collection = $this->getShiftCollection($searchCriteria);
         //$shiftInout = $this->shiftInOut->create();
-        $items      = [];
+        $items = [];
         if ($collection->getLastPageNumber() < $searchCriteria->getData('currentPage')) {
         } else {
             $outletId = $searchCriteria->getData('outlet_id');
             $storeId = $this->retailHelper->getStoreByOutletId($outletId);
             foreach ($collection as $shift) {
-                $shiftData                 = $shift->getData();
+                $shiftData = $shift->getData();
                 $shiftData['open_at'] = $this->retailHelper->convertTimeDBUsingTimeZone(
                     $shift->getData('open_at'),
                     $storeId
@@ -152,14 +152,14 @@ class ShiftManagement extends ServiceAbstract
                 } else {
                     $shiftData['detail_tax'] = "";
                 }
-                $items[]                   = $shiftData;
+                $items[] = $shiftData;
             }
         }
 
         return $this->getSearchResult()
-                    ->setItems($items)
-                    ->setTotalCount($collection->getSize())
-                    ->setLastPageNumber($collection->getLastPageNumber());
+            ->setItems($items)
+            ->setTotalCount($collection->getSize())
+            ->setLastPageNumber($collection->getLastPageNumber());
     }
 
     /**
@@ -180,12 +180,12 @@ class ShiftManagement extends ServiceAbstract
 
         $items = [];
         foreach ($collection as $inOut) {
-            $item               = $inOut->getData();
+            $item = $inOut->getData();
             $item['created_at'] = $this->retailHelper->convertTimeDBUsingTimeZone(
                 $inOut->getData("created_at"),
                 $storeId
             );
-            $items[]            = $item;
+            $items[] = $item;
         }
 
         return $items;
@@ -267,12 +267,12 @@ class ShiftManagement extends ServiceAbstract
      */
     public function openShift()
     {
-        $outletId   = $this->getRequest()->getParam('outlet_id');
+        $outletId = $this->getRequest()->getParam('outlet_id');
         $registerId = $this->getRequest()->getParam('register_id');
-        $userId     = $this->getRequest()->getParam('user_id');
-        $userName   = $this->getRequest()->getParam('user_name');
-        $amount     = $this->getRequest()->getParam('amount');
-        $bankNotes  = $this->getRequest()->getParam('bank_notes', []);
+        $userId = $this->getRequest()->getParam('user_id');
+        $userName = $this->getRequest()->getParam('user_name');
+        $amount = $this->getRequest()->getParam('amount');
+        $bankNotes = $this->getRequest()->getParam('bank_notes', []);
 
         if (is_null($outletId) || is_null($registerId) || is_null($userId) || is_null($userName) || is_null($amount)) {
             throw new Exception("Must define required data");
@@ -283,30 +283,30 @@ class ShiftManagement extends ServiceAbstract
         /** @var \SM\Shift\Model\ResourceModel\Shift\Collection $collection */
         $collection = $this->shiftCollectionFactory->create();
         $collection->addFieldToFilter('outlet_id', $outletId)
-                   ->addFieldToFilter('register_id', $registerId)
-                   ->addFieldToFilter('is_open', 1);
+            ->addFieldToFilter('register_id', $registerId)
+            ->addFieldToFilter('is_open', 1);
         $openShift = $collection->getFirstItem();
         if ($openShift->getId()) {
             throw new Exception("Shift has already been opened");
         }
 
         $shift->setData('is_open', 1)
-              ->setData('register_id', $registerId)
-              ->setData('outlet_id', $outletId)
-              ->setData('user_open_id', $userId)
-              ->setData('user_open_name', $userName)
-              ->setData('start_amount', $amount)
-              ->setData('open_note', $this->getRequest()->getParam('note'))
-              ->setData('detail_tax', '{}')
-              ->setData('bank_notes', json_encode($bankNotes))
-              ->save();
+            ->setData('register_id', $registerId)
+            ->setData('outlet_id', $outletId)
+            ->setData('user_open_id', $userId)
+            ->setData('user_open_name', $userName)
+            ->setData('start_amount', $amount)
+            ->setData('open_note', $this->getRequest()->getParam('note'))
+            ->setData('detail_tax', '{}')
+            ->setData('bank_notes', json_encode($bankNotes))
+            ->save();
 
         return $this->load(
             new DataObject(
                 [
                     'shift_id'    => $shift->getId(),
                     'outlet_id'   => $outletId,
-                    'register_id' => $registerId
+                    'register_id' => $registerId,
                 ]
             )
         )->getOutput();
@@ -318,7 +318,7 @@ class ShiftManagement extends ServiceAbstract
      */
     public function isOpenShift()
     {
-        $outletId   = $this->getRequest()->getParam('outlet_id');
+        $outletId = $this->getRequest()->getParam('outlet_id');
         $registerId = $this->getRequest()->getParam('register_id');
         if (is_null($outletId) || is_null($registerId)) {
             throw new Exception("Must define required data");
@@ -327,13 +327,14 @@ class ShiftManagement extends ServiceAbstract
         /** @var \SM\Shift\Model\ResourceModel\Shift\Collection $collection */
         $collection = $this->shiftCollectionFactory->create();
         $collection->addFieldToFilter('outlet_id', $outletId)
-                   ->addFieldToFilter('register_id', $registerId)
-                   ->addFieldToFilter('is_open', 1);
+            ->addFieldToFilter('register_id', $registerId)
+            ->addFieldToFilter('is_open', 1);
         $openShift = $collection->getFirstItem();
 
         if (!$openShift->getId()) {
             return false;
         }
+
         return true;
     }
 
@@ -347,18 +348,19 @@ class ShiftManagement extends ServiceAbstract
      */
     public function closeShift()
     {
-        $outletId   = $this->getRequest()->getParam('outlet_id');
-        $shiftId    = $this->getRequest()->getParam('shift_id');
+        $outletId = $this->getRequest()->getParam('outlet_id');
+        $shiftId = $this->getRequest()->getParam('shift_id');
         $registerId = $this->getRequest()->getParam('register_id');
-        $userId     = $this->getRequest()->getParam('user_id');
-        $userName   = $this->getRequest()->getParam('user_name');
-        $data       = $this->getRequest()->getParam('data');
+        $userId = $this->getRequest()->getParam('user_id');
+        $userName = $this->getRequest()->getParam('user_name');
+        $data = $this->getRequest()->getParam('data');
         if (is_null($outletId)
             || is_null($registerId)
             || is_null($userId)
             || is_null($userName)
             || is_null($shiftId)
-            || is_null($data)) {
+            || is_null($data)
+        ) {
             throw new Exception("Must define required data");
         }
 
@@ -379,7 +381,8 @@ class ShiftManagement extends ServiceAbstract
         }
 
         if (isset($data['expected'][$this->getCashPaymentId($registerId)])
-            && is_numeric($data['expected'][$this->getCashPaymentId($registerId)])) {
+            && is_numeric($data['expected'][$this->getCashPaymentId($registerId)])
+        ) {
             $totalExpected = $data['expected'][$this->getCashPaymentId($registerId)];
         } else {
             throw new Exception('Total cash expected must be number');
@@ -407,23 +410,23 @@ class ShiftManagement extends ServiceAbstract
         }
 
         $shift->setData('is_open', 0)
-              ->setData('user_close_id', $userId)
-              ->setData('user_close_name', $userName)
-              ->setData('data', json_encode($data))
-              ->setData('close_note', $data['note'])
-              ->setData('take_out_amount', $takeOutAmount)
-              ->setData('total_counted_amount', $totalCounted)
-              ->setData('total_expected_amount', $totalExpected)
-              ->setData('total_net_amount', $totalNetAmount)
-              ->setData('total_adjustment', $totalAdjustment)
-              ->save();
+            ->setData('user_close_id', $userId)
+            ->setData('user_close_name', $userName)
+            ->setData('data', json_encode($data))
+            ->setData('close_note', $data['note'])
+            ->setData('take_out_amount', $takeOutAmount)
+            ->setData('total_counted_amount', $totalCounted)
+            ->setData('total_expected_amount', $totalExpected)
+            ->setData('total_net_amount', $totalNetAmount)
+            ->setData('total_adjustment', $totalAdjustment)
+            ->save();
 
         return $this->load(
             new DataObject(
                 [
                     'shift_id'    => $shiftId,
                     'outlet_id'   => $outletId,
-                    'register_id' => $registerId
+                    'register_id' => $registerId,
                 ]
             )
         )->getOutput();
@@ -435,6 +438,7 @@ class ShiftManagement extends ServiceAbstract
         if ($cashPayment != null) {
             return $cashPayment;
         }
+
         return 1;
     }
 
@@ -444,13 +448,13 @@ class ShiftManagement extends ServiceAbstract
      */
     public function adjustCash()
     {
-        $outletId   = $this->getRequest()->getParam('outlet_id');
-        $shiftId    = $this->getRequest()->getParam('shift_id');
+        $outletId = $this->getRequest()->getParam('outlet_id');
+        $shiftId = $this->getRequest()->getParam('shift_id');
         $registerId = $this->getRequest()->getParam('register_id');
-        $userId     = $this->getRequest()->getParam('user_id');
-        $userName   = $this->getRequest()->getParam('user_name');
-        $amount     = $this->getRequest()->getParam('amount');
-        $isCashIn   = $this->getRequest()->getParam('is_in');
+        $userId = $this->getRequest()->getParam('user_id');
+        $userName = $this->getRequest()->getParam('user_name');
+        $amount = $this->getRequest()->getParam('amount');
+        $isCashIn = $this->getRequest()->getParam('is_in');
         $created_at = $this->retailHelper->getCurrentTime();
         if (is_null($outletId)
             || is_null($registerId)
@@ -464,20 +468,20 @@ class ShiftManagement extends ServiceAbstract
         }
         $shiftInOut = $this->shiftInOut->create();
         $shiftInOut->setData('shift_id', $shiftId)
-                   ->setData('user_name', $userName)
-                   ->setData('user_id', $userId)
-                   ->setData('amount', $amount)
-                   ->setData('note', $this->getRequest()->getParam('note'))
-                   ->setData('is_in', $isCashIn == true || $isCashIn == 1 ? 1 : 0)
-                   ->setData('created_at', $created_at)
-                   ->save();
+            ->setData('user_name', $userName)
+            ->setData('user_id', $userId)
+            ->setData('amount', $amount)
+            ->setData('note', $this->getRequest()->getParam('note'))
+            ->setData('is_in', $isCashIn == true || $isCashIn == 1 ? 1 : 0)
+            ->setData('created_at', $created_at)
+            ->save();
 
         return $this->load(
             new DataObject(
                 [
                     'shift_id'    => $shiftId,
                     'outlet_id'   => $outletId,
-                    'register_id' => $registerId
+                    'register_id' => $registerId,
                 ]
             )
         )->getOutput();
