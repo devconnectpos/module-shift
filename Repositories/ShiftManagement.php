@@ -374,16 +374,14 @@ class ShiftManagement extends ServiceAbstract
         }
 
         $cashPaymentId = $this->getCashPaymentId($registerId);
-        if (isset($data['counted'][$this->getCashPaymentId($registerId)]) && is_numeric($data['counted'][$cashPaymentId])) {
-            $totalCounted = $data['counted'][$this->getCashPaymentId($registerId)];
+        if (isset($data['counted'][$cashPaymentId]) && is_numeric($data['counted'][$cashPaymentId])) {
+            $totalCounted = $data['counted'][$cashPaymentId];
         } else {
             throw new Exception('Total cash counted must be positive number');
         }
 
-        if (isset($data['expected'][$this->getCashPaymentId($registerId)])
-            && is_numeric($data['expected'][$this->getCashPaymentId($registerId)])
-        ) {
-            $totalExpected = $data['expected'][$this->getCashPaymentId($registerId)];
+        if (isset($data['expected'][$cashPaymentId]) && is_numeric($data['expected'][$cashPaymentId])) {
+            $totalExpected = $data['expected'][$cashPaymentId];
         } else {
             throw new Exception('Total cash expected must be number');
         }
@@ -412,7 +410,7 @@ class ShiftManagement extends ServiceAbstract
         $shift->setData('is_open', 0)
             ->setData('user_close_id', $userId)
             ->setData('user_close_name', $userName)
-            ->setData('data', json_encode($data))
+            ->setData('data', json_encode($data, JSON_THROW_ON_ERROR))
             ->setData('close_note', $data['note'])
             ->setData('take_out_amount', $takeOutAmount)
             ->setData('total_counted_amount', $totalCounted)
