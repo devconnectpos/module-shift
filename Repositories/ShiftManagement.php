@@ -410,7 +410,7 @@ class ShiftManagement extends ServiceAbstract
         $shift->setData('is_open', 0)
             ->setData('user_close_id', $userId)
             ->setData('user_close_name', $userName)
-            ->setData('data', json_encode($data, JSON_THROW_ON_ERROR))
+            ->setData('data', json_encode($data))
             ->setData('close_note', $data['note'])
             ->setData('take_out_amount', $takeOutAmount)
             ->setData('total_counted_amount', $totalCounted)
