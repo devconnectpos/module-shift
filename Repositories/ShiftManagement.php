@@ -373,17 +373,20 @@ class ShiftManagement extends ServiceAbstract
             throw new Exception("Can't close shift because it isn't opening");
         }
 
-        $cashPaymentId = $this->getCashPaymentId($registerId);
-        if (isset($data['counted'][$cashPaymentId]) && is_numeric($data['counted'][$cashPaymentId])) {
-            $totalCounted = $data['counted'][$cashPaymentId];
-        } else {
-            throw new Exception('Total cash counted must be positive number');
-        }
+        $cashPaymentMethods = $this->paymentHelper->getPaymentMethodsOfType('cash', $registerId);
 
-        if (isset($data['expected'][$cashPaymentId]) && is_numeric($data['expected'][$cashPaymentId])) {
-            $totalExpected = $data['expected'][$cashPaymentId];
-        } else {
-            throw new Exception('Total cash expected must be number');
+        $totalCounted = 0;
+        $totalExpected = 0;
+
+        foreach ($cashPaymentMethods as $method) {
+            $cashPaymentId = $method->getData('id');
+            if (isset($data['counted'][$cashPaymentId]) && is_numeric($data['counted'][$cashPaymentId])) {
+                $totalCounted += (float)$data['counted'][$cashPaymentId];
+            }
+
+            if (isset($data['expected'][$cashPaymentId]) && is_numeric($data['expected'][$cashPaymentId])) {
+                $totalExpected += (float)$data['expected'][$cashPaymentId];
+            }
         }
 
         if (isset($data['takeOut']) && is_numeric($data['takeOut'])) {
