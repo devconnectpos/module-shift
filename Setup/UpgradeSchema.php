@@ -10,13 +10,13 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @codeCoverageIgnore
  */
 class UpgradeSchema implements UpgradeSchemaInterface
 {
-
     /**
      * {@inheritdoc}
      */
@@ -27,34 +27,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->createShiftInOutTable($setup);
             $this->createRetailTransaction($setup);
         }
+    }
 
-        if (version_compare($context->getVersion(), '1.0.2', '<')) {
-            $this->updateRetailTransaction($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.0.3', '<')) {
-            $this->updateShiftTable($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.1.1', '<')) {
-            $this->fixReportVersion($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.1.2', '<')) {
-            $this->upgradeRetailTransaction($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.1.3', '<')) {
-            $this->upgradeBaseAmountRetailTransaction($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.1.4', '<')) {
-            $this->addRefundWithoutReceiptIdToRetailTransaction($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.1.5', '<')) {
-            $this->addBankNoteToShiftTable($setup);
-        }
+    /**
+     * @param SchemaSetupInterface $setup
+     * @param OutputInterface      $output
+     *
+     * @throws \Zend_Db_Exception
+     */
+    public function execute(SchemaSetupInterface $setup, OutputInterface $output)
+    {
+        $output->writeln('  |__ Create shift table');
+        $this->createShiftTable($setup);
+        $output->writeln('  |__ Create shift in/out table');
+        $this->createShiftInOutTable($setup);
+        $output->writeln('  |__ Create retail transaction table');
+        $this->createRetailTransaction($setup);
     }
 
     /**
@@ -200,6 +188,30 @@ class UpgradeSchema implements UpgradeSchemaInterface
             null,
             ['nullable' => false, 'default' => '1',],
             'Is Active'
+        )->addColumn(
+            'total_order_tax',
+            Table::TYPE_DECIMAL,
+            '12,4',
+            ['nullable' => false, 'default' => '0.0000',],
+            'Total order tax'
+        )->addColumn(
+            'base_total_order_tax',
+            Table::TYPE_DECIMAL,
+            '12,4',
+            ['nullable' => false, 'default' => '0.0000',],
+            'Base total order tax'
+        )->addColumn(
+            'detail_tax',
+            Table::TYPE_TEXT,
+            null,
+            ['nullable' => false],
+            'Detail all tax in shift'
+        )->addColumn(
+            'bank_notes',
+            Table::TYPE_TEXT,
+            '2M',
+            ['nullable' => true],
+            'Shift bank notes'
         );
         $setup->getConnection()->createTable($table);
         $setup->endSetup();
@@ -345,7 +357,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
             Table::TYPE_DECIMAL,
             '12,4',
             ['nullable' => false, 'default' => '0.0000'],
-            'Take out'
+            'Amount'
+        )->addColumn(
+            'base_amount',
+            Table::TYPE_DECIMAL,
+            '12,4',
+            ['nullable' => false, 'default' => '0.0000'],
+            'Base Amount'
         )->addColumn(
             'is_purchase',
             Table::TYPE_SMALLINT,
@@ -364,203 +382,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
             null,
             ['nullable' => false, 'default' => Table::TIMESTAMP_INIT_UPDATE,],
             'Modification Time'
+        )->addColumn(
+            'order_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['nullable' => false],
+            'Modification Time'
+        )->addColumn(
+            'user_name',
+            Table::TYPE_TEXT,
+            255,
+            ['nullable' => false],
+            'User name'
+        )->addColumn(
+            'rwr_transaction_id',
+            Table::TYPE_INTEGER,
+            12,
+            ['nullable' => true],
+            'Refund Without Receipt Transaction Id'
         );
         $setup->getConnection()->createTable($table);
-        $setup->endSetup();
-    }
-
-    /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     */
-    protected function updateRetailTransaction(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_retail_transaction'), 'order_id')) {
-            $setup->getConnection()->addColumn(
-                $setup->getTable('sm_retail_transaction'),
-                'order_id',
-                [
-                    'type'    => Table::TYPE_INTEGER,
-                    'comment' => 'Order Id',
-                ]
-            );
-        }
-        $setup->endSetup();
-    }
-
-    /**
-     * @param SchemaSetupInterface $setup
-     */
-    protected function upgradeRetailTransaction(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_retail_transaction'), 'user_name')) {
-            $setup->getConnection()->addColumn(
-                $setup->getTable('sm_retail_transaction'),
-                'user_name',
-                [
-                    'type'    => Table::TYPE_TEXT,
-                    'size'    => 255,
-                    'comment' => 'User name',
-                ]
-            );
-        }
-
-        $setup->endSetup();
-    }
-
-    /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     */
-    protected function updateShiftTable(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_shift_shift'), 'total_order_tax')) {
-            $setup->getConnection()->addColumn(
-                $setup->getTable('sm_shift_shift'),
-                'total_order_tax',
-                [
-                    'type'      => Table::TYPE_DECIMAL,
-                    'nullable'  => false,
-                    'SCALE'     => 4,
-                    'PRECISION' => 12,
-                    'comment'   => 'Total order tax',
-                    'default'   => '0.0000',
-                ]
-            );
-        }
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_shift_shift'), 'detail_tax')) {
-            $setup->getConnection()->addColumn(
-                $setup->getTable('sm_shift_shift'),
-                'detail_tax',
-                [
-                    'type'     => Table::TYPE_TEXT,
-                    'nullable' => false,
-                    'comment'  => 'Detail all tax in shift',
-                ]
-            );
-        }
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable('sm_shift_shift'), 'base_total_order_tax')) {
-            $setup->getConnection()->addColumn(
-                $setup->getTable('sm_shift_shift'),
-                'base_total_order_tax',
-                [
-                    'type'      => Table::TYPE_DECIMAL,
-                    'nullable'  => false,
-                    'SCALE'     => 4,
-                    'PRECISION' => 12,
-                    'comment'   => 'Total order tax',
-                    'default'   => '0.0000',
-                ]
-            );
-        }
-
-        $setup->endSetup();
-    }
-
-    /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface   $setup
-     * @param \Magento\Framework\Setup\ModuleContextInterface $context
-     */
-    protected function fixReportVersion(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-
-        $this->updateRetailTransaction($setup);
-        $this->updateShiftTable($setup);
-
-        $setup->endSetup();
-    }
-
-    /**
-     * @param SchemaSetupInterface $setup
-     */
-    protected function upgradeBaseAmountRetailTransaction(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        $tableName = $setup->getTable('sm_retail_transaction');
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable($tableName), 'base_amount')) {
-            $setup->getConnection()->addColumn(
-                $tableName,
-                'base_amount',
-                [
-                    'type'      => Table::TYPE_DECIMAL,
-                    'nullable'  => false,
-                    'SCALE'     => 4,
-                    'PRECISION' => 12,
-                    'comment'   => 'Base amount',
-                    'default'   => '0.0000',
-                ]
-            );
-            $select = $setup->getConnection()->select()
-                ->joinLeft(
-                    ['join_table' => $tableName],
-
-                    "main_table.id = join_table.id",
-
-                    array('base_amount' => 'amount')
-                );
-            $query = $setup->getConnection()->updateFromSelect(
-                $select,
-                ['main_table' => $tableName]
-            );
-            $setup->getConnection()->query($query);
-        }
-
-        $setup->endSetup();
-    }
-
-    /**
-     * @param SchemaSetupInterface $setup
-     */
-    protected function addRefundWithoutReceiptIdToRetailTransaction(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        $tableName = $setup->getTable('sm_retail_transaction');
-
-        if (!$setup->getConnection()->tableColumnExists($setup->getTable($tableName), 'rwr_transaction_id')) {
-            $setup->getConnection()->addColumn(
-                $tableName,
-                'rwr_transaction_id',
-                [
-                    'type'     => Table::TYPE_INTEGER,
-                    'nullable' => true,
-                    'length'   => 12,
-                    'comment'  => 'Refund Without Receipt Transaction Id',
-                ]
-            );
-        }
-
-        $setup->endSetup();
-    }
-
-    /**
-     * @param SchemaSetupInterface $setup
-     */
-    protected function addBankNoteToShiftTable(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        $connection = $setup->getConnection();
-        $shiftTable = $setup->getTable('sm_shift_shift');
-
-        if (!$connection->tableColumnExists($shiftTable, 'bank_notes')) {
-            $connection->addColumn(
-                $shiftTable,
-                'bank_notes',
-                [
-                    'type'     => Table::TYPE_TEXT,
-                    'nullable' => true,
-                    'length'   => '2M',
-                    'comment'  => 'Shift bank notes',
-                ]
-            );
-        }
-
         $setup->endSetup();
     }
 }
