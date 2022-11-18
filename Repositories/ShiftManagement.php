@@ -146,9 +146,9 @@ class ShiftManagement extends ServiceAbstract
                 );
                 $shiftData['in_out'] = $this->getInOutData($shift->getId(), $storeId);
                 $shiftData['transactions'] = $this->getPaymentTransaction($shift->getId());
-                $shiftData['data'] = json_decode($shiftData['data']);
+                $shiftData['data'] = json_decode((string)$shiftData['data']);
                 if (isset($shiftData['detail_tax']) && $shiftData['detail_tax'] != null) {
-                    $shiftData['detail_tax'] = json_decode($shiftData['detail_tax'], true);
+                    $shiftData['detail_tax'] = json_decode((string)$shiftData['detail_tax'], true);
                 } else {
                     $shiftData['detail_tax'] = "";
                 }
@@ -243,12 +243,12 @@ class ShiftManagement extends ServiceAbstract
             $collection->addFieldToFilter('id', $shiftId);
         }
 
-        if (is_nan($searchCriteria->getData('currentPage'))) {
+        if (is_nan((float)$searchCriteria->getData('currentPage'))) {
             $collection->setCurPage(1);
         } else {
             $collection->setCurPage($searchCriteria->getData('currentPage'));
         }
-        if (is_nan($searchCriteria->getData('pageSize'))) {
+        if (is_nan((float)$searchCriteria->getData('pageSize'))) {
             $collection->setPageSize(
                 DataConfig::PAGE_SIZE_LOAD_DATA
             );
