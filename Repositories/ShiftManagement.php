@@ -30,6 +30,9 @@ use SM\XRetail\Repositories\Contract\ServiceAbstract;
  */
 class ShiftManagement extends ServiceAbstract
 {
+    const CHANGE = 'Change';
+    const CASH = 'Cash';
+    const PAYMENT_CASH = 'cash';
     /**
      * @var \SM\Shift\Model\ResourceModel\Shift\CollectionFactory
      */
@@ -191,20 +194,43 @@ class ShiftManagement extends ServiceAbstract
         return $items;
     }
 
-    protected function getPaymentTransaction($shiftId, $onlyCash = false)
+    /**
+     * @param $shiftId
+     * @param bool $onlyCash
+     * @return array
+     */
+    protected function getPaymentTransaction($shiftId, $onlyCash = false): array
     {
         /** @var \SM\Shift\Model\ResourceModel\RetailTransaction\Collection $collection */
         $collection = $this->transactionCollectionFactory->create();
+
         $collection->addFieldToFilter('shift_id', $shiftId);
         if ($onlyCash) {
             $collection->addFieldToFilter('payment_type', 'cash');
         }
         $payments = [];
+        $cashPaymentId = $this->getPaymentCashId($collection);
         foreach ($collection as $payment) {
+            if ($payment->getData()['payment_title'] == self::CHANGE) {
+                $payment->setData('payment_id', $cashPaymentId);
+            }
             $payments[] = $payment->getData();
         }
-
         return $payments;
+    }
+
+    /**
+     * @param $collection
+     * @return int
+     */
+    protected function getPaymentCashId($collection): int
+    {
+        foreach ($collection as $payment) {
+            if ($payment->getData()['payment_title'] == self::CASH && $payment->getData()['payment_type'] == self::PAYMENT_CASH) {
+                return $payment->getData()['payment_id'] ?? 0;
+            }
+        }
+        return 0;
     }
 
     /**
