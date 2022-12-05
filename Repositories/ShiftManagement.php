@@ -209,28 +209,23 @@ class ShiftManagement extends ServiceAbstract
             $collection->addFieldToFilter('payment_type', 'cash');
         }
         $payments = [];
-        $cashPaymentId = $this->getPaymentCashId($collection);
+
+        $validPaymentMethods = [];
         foreach ($collection as $payment) {
-            if ($payment->getData()['payment_title'] == self::CHANGE) {
-                $payment->setData('payment_id', $cashPaymentId);
+            if ($payment->getData('payment_id') < 100000) {
+                $key = strtolower($payment->getData('payment_title')) . '_' . strtolower($payment->getData('payment_type'));
+                $validPaymentMethods[$key] = $payment->getData('payment_id');
+            }
+        }
+
+        foreach ($collection as $payment) {
+            $key = strtolower($payment->getData('payment_title')) . '_' . strtolower($payment->getData('payment_type'));
+            if (isset($validPaymentMethods[$key])) {
+                $payment->setData('payment_id', $validPaymentMethods[$key]);
             }
             $payments[] = $payment->getData();
         }
         return $payments;
-    }
-
-    /**
-     * @param $collection
-     * @return int
-     */
-    protected function getPaymentCashId($collection): int
-    {
-        foreach ($collection as $payment) {
-            if ($payment->getData()['payment_title'] == self::CASH && $payment->getData()['payment_type'] == self::PAYMENT_CASH) {
-                return $payment->getData()['payment_id'] ?? 0;
-            }
-        }
-        return 0;
     }
 
     /**
